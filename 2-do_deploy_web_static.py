@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+""" this script executes a deploy function using fabric """
 from fabric.api import put, run, env
 from datetime import datetime
 import os
