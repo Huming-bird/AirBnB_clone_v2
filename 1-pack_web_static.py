@@ -1,31 +1,28 @@
 #!/usr/bin/python3
-"""A module for Fabric script that generates a .tgz archive."""
-import os
-from time import strftime
-from fabric.api import local, runs_once
+"""abric script that generates a .tgz archive from the
+   contents of the web_static folder of your AirBnB Clone repository"""
+from fabric.api import local
+from fabric.api import get
+from fabric.api import put
+from fabric.api import reboot
+from fabric.api import run
+from fabric.api import sudo
+from fabric.context_managers import cd
+import time
+import os.path
+from datetime import datetime
 
 
-@runs_once
 def do_pack():
-    """Archives the static files."""
-    time = strftime("%Y%m%d%H%M%S")
-    if not os.path.isdir("versions"):
-        os.mkdir("versions")
-    # d_time = datetime.now()
-    output = "versions/web_static_{}.tgz".format(time)
-    # output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-    # d_time.year,
-    # d_time.month,
-    # d_time.day,
-    # d_time.hour,
-    # d_time.minute,
-    # d_time.second
-    # )
-    try:
-        print("Packing web_static to {}".format(output))
-        local("tar -cvzf {} web_static".format(output))
-        size = os.stat(output).st_size
-        print("web_static packed: {} -> {} Bytes".format(output, size))
-    except Exception:
-        output = None
-    return output
+    """create a tar file of the folder web_static"""
+    path = "versions/web_static"
+    now = datetime.now()
+    ext = now.strftime("%Y%m%d%H%M%S")
+    archive = "%s_%s.tgz" % (path, ext)
+    
+    if os.path.isdir("versions") is False:
+        if local("mkdir -p versions").failed:
+            return None
+    if local("tar -cvzf {} web_static".format(archive)).failed:
+        return None
+    return archive
