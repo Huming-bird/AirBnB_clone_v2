@@ -1,48 +1,43 @@
 #!/usr/bin/python3
-"""
-This python program use Fabric to create and distribute archive to my web
-servers
-"""
-
+"""Fabric script that distributes an archive to your web servers"""
+from fabric.api import local
+from fabric.api import get
+from fabric.api import put
+from fabric.api import env
+from fabric.api import reboot
+from fabric.api import run
+from fabric.api import sudo
+from fabric.context_managers import cd
+import time
 import os.path
 from datetime import datetime
-from fabric.api import env, local, put, run
 
-env.hosts = ['100.26.49.104', '18.204.6.37']
+env.hosts = ["54.174.125.206", "35.174.185.141"]
 
 
 def do_pack():
-    """Creating an archive_dir of the directory web_static."""
-    dt = datetime.utcnow()
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(dt.year,
-                                                         dt.month,
-                                                         dt.day,
-                                                         dt.hour,
-                                                         dt.minute,
-                                                         dt.second)
+    """create a tar file of the folder web_static"""
+    da = "versions/web_static"
+    now = datetime.now()
+    dt_string = now.strftime("%Y%m%d%H%M%S")
+    ds = "%s_%s.tgz" % (da, dt_string)
+    """ds = "%s_%s.tgz" % (da, time.strftime("%Y%m%d%H%M%S", time.gmtime()))"""
     if os.path.isdir("versions") is False:
         if local("mkdir -p versions").failed is True:
             return None
-    if local("tar -cvzf {} web_static".format(file)).failed is True:
+    if local("tar -cvzf {} web_static".format(ds)).failed is True:
         return None
-    return file
+    return ds
 
 
 def do_deploy(archive_path):
-    """Distributes the created archive to the web servers.
-
-    Args: archive_path (str): The path of the archive to distribute.
-    Returns: If the file doesn't exist at archive_path or an error occurs
-            program should - False.
-            Otherwise - True.
-    """
+    """distributed the archive to my web servers"""
     if os.path.isfile(archive_path) is False:
         return False
-    file = archive_path.split("/")[-1]
-    name = file.split(".")[0]
-
-    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+    ds = archive_path.split("/")[-1]
+    if put(archive_path, "/tmp/{}".format(ds)).failed is True:
         return False
+    name = file.split(".")[0]
     if run("rm -rf /data/web_static/releases/{}/".
            format(name)).failed is True:
         return False
@@ -69,8 +64,9 @@ def do_deploy(archive_path):
 
 
 def deploy():
-    """Finaly create and distribute an archive to a web server."""
+    """distributed the archive to my web servers"""
     file = do_pack()
     if file is None:
         return False
-    return do_deploy(file)
+    res = do_deploy(file)
+    return res

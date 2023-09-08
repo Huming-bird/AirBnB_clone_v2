@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 """ this script executes a deploy function using fabric """
-from fabric.api import put, run, env, env_key_filename
+from fabric.api import put, run, env
 from datetime import datetime
 import os
 
-private_key_file = os.path.expanduser("~/.ssh/c12_key")
-env_key_filename = private_key_file
 env.hosts = ['54.174.125.206', '35.174.185.141']
 env.user = 'ubuntu'
 
