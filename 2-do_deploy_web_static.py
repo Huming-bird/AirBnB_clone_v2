@@ -27,7 +27,9 @@ def do_deploy(archive_path):
         return False
     if run("mkdir /data/web_static/releases/{}".format(name)).failed:
         return False
-    if run("mv /data/web_static/releases/web_static/* /data/web_static/releases/{}".format(name)).failed:
+
+    if run("mv /data/web_static/releases/web_static/*\
+            /data/web_static/releases/{}".format(name)).failed:
         return False
     if run("rm /tmp/{}".format(ds)).failed:
         return False
