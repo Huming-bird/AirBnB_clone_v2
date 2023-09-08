@@ -8,24 +8,33 @@ env.hosts = ['54.174.125.206', '35.174.185.141']
 
 
 def do_deploy(archive_path):
-    """ this function deploys .tgz file to my server """
-    if not os.path.isfile(archive_path):
+    """distributed the archive to my web servers"""
+    if os.path.isfile(archive_path) is False:
         return False
-
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    archive_filename = os.path.basename(archive_path)
-    name = os.path.splitext(archive_filename)[0]
-
-    remote_tmp = "/tmp/{}".format(archive_filename)
-    remote_dir = "/data/web_static/releases/{}/".format(name)
-
-    put(archive_path, remote_tmp)
-    run("mkdir -p {}".format(remote_dir))
-    run("tar -xzf {} -C {}".format(remote_tmp, remote_dir))
-    run("rm {}".format(remote_tmp))
-    run("mv {}web_static/* {}".format(remote_dir, remote_dir))
-    run("rm -rf {}web_static".format(remote_dir))
-    run("rm -rf /data/web_static/current")
-    run("ln -s {} /data/web_static/current".format(remote_dir))
-
+    ds = archive_path.split("/")[-1]
+    if put(archive_path, "/tmp/{}".format(ds)).failed is True:
+        return False
+    name = file.split(".")[0]
+    if run("rm -rf /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("mkdir -p /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
+           format(file, name)).failed is True:
+        return False
+    if run("rm /tmp/{}".format(file)).failed is True:
+        return False
+    if run("mv /data/web_static/releases/{}/web_static/* "
+           "/data/web_static/releases/{}/".format(name, name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/releases/{}/web_static".
+           format(name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/current").failed is True:
+        return False
+    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
+           format(name)).failed is True:
+        return False
     return True
