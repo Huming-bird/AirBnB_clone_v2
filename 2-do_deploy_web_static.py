@@ -13,21 +13,21 @@ def do_deploy(archive_path):
     if os.path.isfile(archive_path) is False:
         return False
     ds = archive_path.split("/")[-1]
-    if put(archive_path, "/tmp/{}".format(ds)).failed is True:
+    if put(archive_path, "/tmp/{}".format(ds)).failed:
         return False
     name = ds.split(".")[0]
-    if sudo("rm -rf /data/web_static/releases").failed is True:
+    if run("rm -rf /data/web_static/releases").failed:
         return False
-    if sudo("mkdir -p /data/web_static/releases").failed is True:
+    if run("mkdir -p /data/web_static/releases").failed:
         return False
-    if sudo("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-            format(ds, name)).failed is True:
+    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
+            format(ds, name)).failed:
         return False
-    if sudo("rm /tmp/{}".format(ds)).failed is True:
+    if run("rm /tmp/{}".format(ds)).failed:
         return False
-    if sudo("rm -rf /data/web_static/current").failed is True:
+    if run("rm -rf /data/web_static/current").failed:
         return False
-    if sudo("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-            format(name)).failed is True:
+    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
+            format(name)).failed:
         return False
     return True
