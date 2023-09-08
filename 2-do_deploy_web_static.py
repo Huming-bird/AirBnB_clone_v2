@@ -4,6 +4,7 @@ import os
 
 env.hosts = ['54.174.125.206', '35.174.185.141']
 
+
 def do_deploy(archive_path):
     """ this function deploys .tgz file to my server """
     if not os.path.isfile(archive_path):
