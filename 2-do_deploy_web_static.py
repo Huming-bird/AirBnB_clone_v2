@@ -1,11 +1,26 @@
 #!/usr/bin/python3
 """ this script executes a deploy function using fabric """
-from fabric.api import put, run, env
+from fabric.api import put, run, env, local
 from datetime import datetime
 import os
 
 env.hosts = ['54.174.125.206', '35.174.185.141']
 env.user = 'ubuntu'
+
+
+def do_pack():
+    """create a tar file of the folder web_static"""
+    path = "versions/web_static"
+    now = datetime.now()
+    ext = now.strftime("%Y%m%d%H%M%S")
+    archive = "%s_%s.tgz" % (path, ext)
+
+    if os.path.isdir("versions") is False:
+        if local("mkdir -p versions").failed:
+            return None
+    if local("tar -cvzf {} web_static".format(archive)).failed:
+        return None
+    return archive
 
 
 def do_deploy(archive_path):
