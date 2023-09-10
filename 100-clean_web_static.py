@@ -60,24 +60,24 @@ directory = "/data/web_static/releases/"
 
 
 def do_clean(number=0):
-    """ this fnc deletes old archives from a server """
-    run(f"ls -ltr {directory} > file_list.txt")
+    """Delete out-of-date archives.
 
-    if number > 1:
-        run(f"head -n {number} file_list.txt > selected_files.txt")
+    Args:
+        number (int): The number of archives to keep.
 
-    if number == 0 or number == 1:
-        run("tail -n 1 file_list.txt > selected_files.txt")
+    If number is 0 or 1, keeps only the most recent archive. If
+    number is 2, keeps the most and second-most recent archives,
+    etc.
+    """
+    number = 1 if int(number) == 0 else int(number)
 
-    with cd(directory):
-        run("while read -r line; do "
-            "filename=$(echo \"$line\" | awk '{print $NF}'); "
-            "if [ -f \"$filename\" ]; then "
-            "rm -f \"$filename\"; "
-            "echo \"Deleted: $filename\"; "
-            "else "
-            "echo \"File not found: $filename\"; "
-            "fi; "
-            "done < selected_files.txt")
+    archives = sorted(os.listdir("versions"))
+    [archives.pop() for i in range(number)]
+    with lcd("versions"):
+        [local("rm ./{}".format(a)) for a in archives]
 
-    run("rm -f file_list.txt selected_files.txt")
+    with cd("/data/web_static/releases"):
+        archives = run("ls -tr").split()
+        archives = [a for a in archives if "web_static_" in a]
+        [archives.pop() for i in range(number)]
+        [run("rm -rf ./{}".format(a)) for a in archives]
