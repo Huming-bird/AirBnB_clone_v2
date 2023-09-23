@@ -29,7 +29,7 @@ def custom(text):
     return (f"C {text}")
 
 
-@app.route('/python/<text>')
+@app.route('/python/<text>', strict_slashes=False)
 def python(text="is cool"):
     """ custom python route"""
     if '_' in text:
