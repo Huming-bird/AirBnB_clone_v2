@@ -39,7 +39,7 @@ def python(text="is cool"):
     return (f"Python {text}")
 
 
-@app.route('/number/<int: n>', strict_slashes=False)
+@app.route('/number/<int:n>', strict_slashes=False)
 def number(n):
     """ displays only integer numbers """
     if isinstance(n, int):
